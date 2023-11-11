@@ -18,16 +18,17 @@ public class SkillController {
     @Autowired
     private SkillRepository skillRepository;
 
-    @GetMapping("add")
-    public String displayAddEmployerForm(Model model) {
-        model.addAttribute(new Skill());
-        return "skills/add";
-    }
     @GetMapping("")
     public String index(Model model) {
         model.addAttribute("title", "All Skills");
         model.addAttribute("skill", skillRepository.findAll());
         return "skills/index";
+    }
+
+    @GetMapping("add")
+    public String displayAddEmployerForm(Model model) {
+        model.addAttribute(new Skill());
+        return "skills/add";
     }
 
 

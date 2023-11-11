@@ -1,6 +1,5 @@
 package org.launchcode.techjobs.persistent.controllers;
 
-import jakarta.validation.Valid;
 import org.launchcode.techjobs.persistent.models.Employer;
 import org.launchcode.techjobs.persistent.models.Job;
 import org.launchcode.techjobs.persistent.models.Skill;
@@ -13,9 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * Created by LaunchCode
@@ -38,31 +37,43 @@ public class HomeController {
     public String index(Model model) {
 
         model.addAttribute("title", "MyJobs");
+        model.addAttribute("jobs", jobRepository.findAll());
 
         return "index";
     }
 
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
-	model.addAttribute("title", "Add Job");
+	    model.addAttribute("title", "Add Job");
         model.addAttribute(new Job());
+        model.addAttribute("employers", employerRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
+
         return "add";
     }
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId) {
+                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
         if (errors.hasErrors()) {
 	    model.addAttribute("title", "Add Job");
             return "add";
         }
 
+        Employer optEmployer = employerRepository.findById(employerId).orElse(new Employer());
+        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+        newJob.setEmployer(optEmployer);
+        newJob.setSkills(skillObjs);
+        jobRepository.save(newJob);
+
         return "redirect:";
     }
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
+        Job optJob = jobRepository.findById(jobId).orElse(new Job());
+        model.addAttribute("job, optJob");
 
             return "view";
     }
